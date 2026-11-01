@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoTrack | Plastic Usage Tracker</title>
+<style>
+:root{--green:#188451;--dark:#123b2b;--mint:#e9f7ef;--bg:#f5f8f6;--ink:#193329;--muted:#6d7f75;--line:#e0e9e3;--white:#fff;--orange:#f0a64b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif}
+header{background:linear-gradient(120deg,#123b2b,#188451);color:white;padding:26px max(20px,calc((100% - 1120px)/2));}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:14px;background:#ffffff24;display:grid;place-items:center;font-size:25px}
+h1{font-size:25px;margin:0}header p{margin:7px 0 0;color:#d9f3e4;font-size:14px}
+main{max-width:1120px;margin:24px auto;padding:0 18px 40px}.topline{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+h2{font-size:19px;margin:0 0 14px}.muted{color:var(--muted);font-size:13px}.pill{border:1px solid #b8dfc8;background:var(--mint);color:var(--green);border-radius:30px;padding:8px 12px;font-size:12px;font-weight:700}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px}.card,.panel{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:19px;box-shadow:0 4px 18px #123b2b08}
+.metric-label{font-size:13px;color:var(--muted)}.metric{font-size:30px;font-weight:750;margin:9px 0 5px;letter-spacing:-1px}.metric-note{font-size:12px;color:var(--green)}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{margin-bottom:18px}.panel-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:14px}
+label{font-size:13px;font-weight:650;display:block;margin:10px 0 6px}input,select{width:100%;padding:11px 12px;border:1px solid #d4e1d8;border-radius:10px;font:inherit;background:white;color:var(--ink)}input:focus,select:focus{outline:2px solid #a6dfbc;border-color:var(--green)}
+.formrow{display:grid;grid-template-columns:1fr 1fr;gap:12px}.btn{border:0;border-radius:10px;padding:11px 15px;background:var(--green);color:white;font-weight:700;cursor:pointer;font-size:14px}.btn:hover{filter:brightness(.95)}.btn.secondary{background:var(--mint);color:var(--green);border:1px solid #c8e8d3}.btn.danger{background:#fff0ee;color:#b43b2f;padding:7px 10px}.full{width:100%;margin-top:14px}
+.progress{height:10px;background:#eaf0ec;border-radius:20px;overflow:hidden}.progress span{display:block;height:100%;background:linear-gradient(90deg,#25a568,#8bd6a4);width:0%;transition:width .25s}
+.chart{display:flex;align-items:end;gap:10px;height:150px;padding:15px 2px 0;border-bottom:1px solid var(--line)}.barcol{flex:1;height:100%;display:flex;flex-direction:column;justify-content:end;align-items:center;gap:6px;min-width:0}.bar{width:min(38px,75%);background:#70c994;border-radius:7px 7px 2px 2px;min-height:3px}.bar.today{background:var(--green)}.barval{font-size:11px;color:var(--muted)}.day{font-size:11px;color:var(--muted)}
+.list{display:flex;flex-direction:column;gap:9px}.entry{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid #edf2ee}.entry:last-child{border:0}.emoji{width:40px;height:40px;background:var(--mint);border-radius:12px;display:grid;place-items:center;font-size:20px}.entry-info{flex:1;min-width:0}.entry-name{font-weight:700;font-size:14px}.entry-sub{font-size:12px;color:var(--muted);margin-top:4px}.qty{font-weight:750;white-space:nowrap}.empty{text-align:center;padding:26px 8px;color:var(--muted);font-size:14px}
+.tip{background:#fff7e8;border:1px solid #f7e5c2;padding:14px;border-radius:13px;font-size:13px;line-height:1.5}.tip b{color:#9a6218}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:18px}
+@media(max-width:800px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.layout{grid-template-columns:1fr}.metric{font-size:26px}}
+@media(max-width:420px){.cards{gap:8px}.card{padding:13px}.metric{font-size:23px}.formrow{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="logo">♻️</div><div><h1>EcoTrack</h1><p>Small choices today. A lighter plastic footprint tomorrow.</p></div></div></header>
+<main>
+ <div class="topline"><div><h2>Your plastic footprint</h2><div class="muted">Track usage, set a goal, and build better habits.</div></div><span class="pill">🌱 Sustainability dashboard</span></div>
+ <section class="cards">
+  <div class="card"><div class="metric-label">Items today</div><div class="metric" id="todayItems">0</div><div class="metric-note">Logged today</div></div>
+  <div class="card"><div class="metric-label">Items this week</div><div class="metric" id="weekItems">0</div><div class="metric-note">Monday–Sunday</div></div>
+  <div class="card"><div class="metric-label">Estimated plastic</div><div class="metric" id="weekWeight">0 g</div><div class="metric-note">Approximate weekly weight</div></div>
+  <div class="card"><div class="metric-label">Weekly goal</div><div class="metric" id="goalText">35</div><div class="metric-note" id="goalCaption">Items per week</div></div>
+ </section>
+ <div class="layout">
+  <div>
+   <section class="panel">
+    <div class="panel-head"><h2>＋ Log plastic usage</h2><span class="muted">Quick entry</span></div>
+    <form id="usageForm">
+     <label for="item">Plastic item</label><select id="item" required>
+      <option value="Plastic bottle">Plastic bottle</option><option value="Plastic bag">Plastic bag</option><option value="Plastic cup">Plastic cup</option><option value="Food wrapper">Food wrapper</option><option value="Plastic container">Plastic container</option><option value="Straw">Straw</option><option value="Other plastic item">Other plastic item</option>
+     </select>
+     <div class="formrow"><div><label for="quantity">Quantity</label><input id="quantity" type="number" min="1" max="999" value="1" required></div><div><label for="date">Date used</label><input id="date" type="date" required></div></div>
+     <label for="note">Note (optional)</label><input id="note" type="text" maxlength="100" placeholder="e.g. bought lunch on campus">
+     <button class="btn full" type="submit">＋ Add to tracker</button>
+    </form>
+   </section>
+   <section class="panel">
+    <div class="panel-head"><h2>🎯 Weekly reduction goal</h2></div>
+    <label for="goal">Maximum items per week</label><div class="formrow"><input id="goal" type="number" min="1" max="9999" value="35"><button class="btn secondary" id="saveGoal" type="button">Save goal</button></div>
+    <div style="display:flex;justify-content:space-between;margin:15px 0 8px;font-size:13px"><span id="goalProgressText">0 of 35 items</span><b id="goalPercent">0%</b></div>
+    <div class="progress"><span id="goalBar"></span></div><p class="muted" id="goalMessage">Every reusable choice makes a difference.</p>
+   </section>
+  </div>
+  <div>
+   <section class="panel">
+    <div class="panel-head"><h2>📊 Last 7 days</h2><span class="muted">Items logged</span></div><div id="chart" class="chart"></div><div class="muted" style="margin-top:10px">Use this chart to notice patterns in your consumption.</div>
+   </section>
+   <section class="panel">
+    <div class="panel-head"><h2>🌿 Try this instead</h2></div>
+    <div class="tip" id="tip"><b>Today's tip:</b> Carry a reusable water bottle to avoid single-use bottles.</div>
+    <button class="btn secondary full" id="nextTip" type="button">Show another tip ↗</button>
+   </section>
+  </div>
+ </div>
+ <section class="panel">
+  <div class="panel-head"><div><h2>Recent entries</h2><div class="muted">Your saved usage log</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn secondary" id="exportBtn" type="button">Export CSV</button><button class="btn danger" id="clearBtn" type="button">Clear all</button></div></div>
+  <div id="entries" class="list"><div class="empty">No entries yet. Add your first item above.</div></div>
+ </section>
+ <footer>EcoTrack • Plastic awareness project • Weight values are estimates and may vary by product.</footer>
+</main>
+<script>
+const weights={"Plastic bottle":20,"Plastic bag":5,"Plastic cup":4,"Food wrapper":3,"Plastic container":25,"Straw":1,"Other plastic item":10};
+const icons={"Plastic bottle":"🧴","Plastic bag":"🛍️","Plastic cup":"🥤","Food wrapper":"🍬","Plastic container":"🥡","Straw":"🥢","Other plastic item":"♻️"};
+const tips=[
+"Carry a reusable water bottle to avoid single-use bottles.",
+"Keep a cloth bag in your backpack for unexpected shopping.",
+"Choose unpackaged fruit and vegetables when practical.",
+"Carry a reusable cup or ask whether a shop accepts one.",
+"Refill containers where safe and available instead of buying new ones.",
+"Check whether packaging can be avoided before purchasing.",
+"Sort plastic waste according to your local recycling rules."
+];
+let tipIndex=0;
+const $=id=>document.getElementById(id);
+const localDate=(d=new Date())=>{const x=new Date(d.getTime()-d.getTimezoneOffset()*60000);return x.toISOString().slice(0,10)};
+$("date").value=localDate();
+let records=[];
+try{records=JSON.parse(localStorage.getItem("ecotrack-records")||"[]")}catch(e){records=[]}
+let goal=Number(localStorage.getItem("ecotrack-goal")||35);
+$("goal").value=goal;
+function save(){localStorage.setItem("ecotrack-records",JSON.stringify(records));localStorage.setItem("ecotrack-goal",String(goal))}
+function startOfWeek(d){let x=new Date(d+"T12:00:00");let day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);return localDate(x)}
+function isThisWeek(date){return date>=startOfWeek(localDate())&&date<=localDate()}
+function sum(rs){return rs.reduce((n,r)=>n+r.quantity,0)}
+function render(){
+ const today=localDate(),week=records.filter(r=>isThisWeek(r.date)),todayRs=records.filter(r=>r.date===today),items=sum(week);
+ $("todayItems").textContent=sum(todayRs);$("weekItems").textContent=items;
+ $("weekWeight").textContent=Math.round(week.reduce((n,r)=>n+(weights[r.item]||10)*r.quantity,0))+" g";
+ $("goalText").textContent=goal;$("goalProgressText").textContent=items+" of "+goal+" items";
+ const pct=Math.round(items/goal*100);$("goalPercent").textContent=pct+"%";$("goalBar").style.width=Math.min(pct,100)+"%";
+ $("goalMessage").textContent=items<=goal?"You're within your weekly target. Keep going!":"You've passed your target. Review your entries and set a realistic next goal.";
+ const days=[];for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);let ds=localDate(d);days.push({date:ds,label:d.toLocaleDateString(undefined,{weekday:"short"}),n:sum(records.filter(r=>r.date===ds))})}
+ const max=Math.max(1,...days.map(d=>d.n));$("chart").innerHTML=days.map(d=>`<div class="barcol"><div class="barval">${d.n}</div><div class="bar ${d.date===today?"today":""}" style="height:${Math.max(3,d.n/max*100)}%"></div><div class="day">${d.label}</div></div>`).join("");
+ const sorted=[...records].sort((a,b)=>(b.date+b.id).localeCompare(a.date+a.id)).slice(0,10);
+ $("entries").innerHTML=sorted.length?sorted.map(r=>`<div class="entry"><div class="emoji">${icons[r.item]||"♻️"}</div><div class="entry-info"><div class="entry-name">${escapeHtml(r.item)}</div><div class="entry-sub">${r.date}${r.note?" · "+escapeHtml(r.note):""}</div></div><div class="qty">× ${r.quantity}</div><button class="btn danger" type="button" aria-label="Delete entry" onclick="removeRecord('${r.id}')">Delete</button></div>`).join(""):'<div class="empty">No entries yet. Add your first item above.</div>';
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+$("usageForm").addEventListener("submit",e=>{e.preventDefault();const quantity=Number($("quantity").value);if(!Number.isInteger(quantity)||quantity<1){alert("Please enter a whole quantity of at least 1.");return}records.push({id:Date.now().toString()+Math.random().toString(16).slice(2),item:$("item").value,quantity,date:$("date").value,note:$("note").value.trim()});save();render();$("quantity").value=1;$("note").value=""});
+$("saveGoal").addEventListener("click",()=>{const n=Number($("goal").value);if(!Number.isInteger(n)||n<1){alert("Enter a goal of at least 1 item.");return}goal=n;save();render()});
+window.removeRecord=id=>{records=records.filter(r=>r.id!==id);save();render()};
+$("clearBtn").addEventListener("click",()=>{if(confirm("Delete all saved usage entries? This cannot be undone.")){records=[];save();render()}});
+$("exportBtn").addEventListener("click",()=>{const rows=[["Date","Item","Quantity","Note"],...records.map(r=>[r.date,r.item,r.quantity,r.note])];const csv=rows.map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\r\n");const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="ecotrack-usage.csv";a.click();URL.revokeObjectURL(url)});
+$("nextTip").addEventListener("click",()=>{tipIndex=(tipIndex+1)%tips.length;$("tip").innerHTML="<b>Today's tip:</b> "+tips[tipIndex]});
+render();
+</script>
+</body></html>
